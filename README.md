@@ -12,6 +12,7 @@
 1. REACT. (jsx)
 2. CRA.
 3. Хуки
+
    **GitHub Pages**
 
 - [Ссылка на Github Pages](https://kozmidis.github.io/mesto-react/)
