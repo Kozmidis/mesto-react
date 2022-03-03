@@ -1,39 +1,18 @@
 import React from "react";
-import { api } from "../utils/api";
 import Card from "./Card";
+import { CurrentUserContext } from "../contexts/CurrentUserContext";
 
 export default function Main({
   handleEditProfileClick,
   handleAddProfileClick,
   handleAvatarProfileClick,
   handleImageClick,
+  cards,
+  handleCardLike,
+  handleCardRemove,
 }) {
-  const [userName, setUserName] = React.useState(" ");
-  const [userDescription, setUserDescription] = React.useState(" ");
-  const [userAvatar, setUserAvatar] = React.useState(" ");
-  const [cards, setUserCards] = React.useState([]);
+  const currentUser = React.useContext(CurrentUserContext);
 
-  React.useEffect(() => {
-    Promise.all([api.getUserProfile(), api.getUserCards()])
-      .then(([userData, userCard]) => {
-        setUserName(userData.name);
-        setUserDescription(userData.about);
-        setUserAvatar(userData.avatar);
-
-        setUserCards(
-          userCard.map((item) => ({
-            name: item.name,
-            image: item.link,
-            alt: item.name,
-            likes: item.likes,
-            id: item._id,
-          }))
-        );
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }, []);
   return (
     <main className="content">
       <section className="profile">
@@ -45,16 +24,16 @@ export default function Main({
             ></div>
             <img
               className="profile__main-avatar"
-              src={userAvatar}
+              src={currentUser.avatar}
               alt="аватар"
             />
           </div>
 
           <div className="profile__edit-panel">
             <div className="profile__main-info">
-              <h1 className="profile__name">{userName}</h1>
+              <h1 className="profile__name">{currentUser.name}</h1>
 
-              <p className="profile__about-me">{userDescription}</p>
+              <p className="profile__about-me">{currentUser.about}</p>
             </div>
             <button
               onClick={handleEditProfileClick}
@@ -76,9 +55,11 @@ export default function Main({
           <div className="photos__cards">
             {cards.map((item) => (
               <Card
-                key={item.id}
+                handleCardLike={handleCardLike}
+                key={item._id}
                 card={item}
                 handleImageClick={handleImageClick}
+                handleCardRemove={handleCardRemove}
               />
             ))}
           </div>

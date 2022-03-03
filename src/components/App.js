@@ -3,13 +3,89 @@ import Footer from "./Footer";
 import Header from "./Header";
 import ImagePopup from "./ImagePopup";
 import Main from "./Main";
-import PopupWithForm from "./PopupWithForm";
+import { api } from "../utils/api";
+import { CurrentUserContext } from "../contexts/CurrentUserContext";
+import EditProfilePopup from "./EditProfilePopup";
+import EditAvatarPopup from "./EditAvatarPopup";
+import AddPlacePopup from "./AddPlacePopup";
 
 function App() {
   const [isEditPopupOpen, setEditPopupOpen] = React.useState(false);
   const [isAvatarPopupOpen, setAvatarPopupOpen] = React.useState(false);
   const [isAddPopupOpen, setAddPopupOpen] = React.useState(false);
   const [selectedCard, setSelectedCard] = React.useState({});
+
+  const [currentUser, setCurrentUser] = React.useState({});
+  const [cards, setUserCards] = React.useState([]);
+
+  function handleAddPlaceSubmit(data) {
+    api
+      .addCard(data)
+      .then((newCard) => {
+        setUserCards([newCard, ...cards]);
+        if (newCard) {
+          closeAllPopups();
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+
+  React.useEffect(() => {
+    Promise.all([api.getUserProfile(), api.getUserCards()])
+      .then(([userData, userCard]) => {
+        setCurrentUser(userData);
+        setUserCards(userCard);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, []);
+
+  function handleCardLike(card) {
+    const isLiked = card.likes.some((i) => i._id === currentUser._id);
+
+    api.changeLikeCardStatus(card._id, isLiked).then((item) => {
+      setUserCards((state) =>
+        state.map((c) => (c._id === card._id ? item : c))
+      );
+    });
+  }
+
+  function handleCardRemove(cardId) {
+    api.removeCard(cardId).then(() => {
+      setUserCards((state) => state.filter((c) => c._id !== cardId));
+    });
+  }
+
+  function handleUpdateUser(data) {
+    api
+      .setUserProfile(data)
+      .then((userData) => {
+        setCurrentUser(userData);
+        if (userData) {
+          closeAllPopups();
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+
+  function handleUpdateAvatar(data) {
+    api
+      .editAvatar(data)
+      .then((avatarData) => {
+        setCurrentUser(avatarData);
+        if (avatarData) {
+          closeAllPopups();
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
 
   function handleEditProfileClick() {
     setEditPopupOpen(true);
@@ -41,13 +117,16 @@ function App() {
   }
 
   return (
-    <>
+    <CurrentUserContext.Provider value={currentUser}>
       <Header />
       <Main
         handleEditProfileClick={handleEditProfileClick}
         handleAddProfileClick={handleAddProfileClick}
         handleAvatarProfileClick={handleAvatarProfileClick}
         handleImageClick={handleImageClick}
+        cards={cards}
+        handleCardLike={handleCardLike}
+        handleCardRemove={handleCardRemove}
       />
       <Footer />
 
@@ -56,93 +135,27 @@ function App() {
         onClose={closeAllPopups}
         handleClickClose={closeOverlayPopup}
       />
-
-      <PopupWithForm
-        isOpen={isEditPopupOpen}
-        name={"popup__edit"}
-        title={"Редактировать профиль"}
-        buttonText={"Сохранить"}
-        onClose={closeAllPopups}
-        handleClickClose={closeOverlayPopup}
-      >
-        <input
-          id="user"
-          form="formEdit"
-          type="text"
-          className="popup__form-input popup__form-input_input_name"
-          name="name"
-          placeholder="Введите имя"
-          minLength="2"
-          maxLength="40"
-          required
-        />
-        <span className="popup__form-input-error user-error" />
-        <input
-          id="userjob"
-          form="formEdit"
-          type="text"
-          className="popup__form-input popup__form-input_input_job"
-          name="about"
-          placeholder="Расскажите о себе"
-          minLength="2"
-          maxLength="200"
-          required
-        />
-        <span className="popup__form-input-error userjob-error" />
-      </PopupWithForm>
-
-      <PopupWithForm
-        isOpen={isAddPopupOpen}
-        name={"popup__add"}
-        title={"Новое место"}
-        buttonText={"Создать"}
-        onClose={closeAllPopups}
-        handleClickClose={closeOverlayPopup}
-      >
-        <input
-          id="place"
-          form="formAdd"
-          type="text"
-          className="popup__form-input popup__form-input_input_place"
-          name="name"
-          placeholder="Название"
-          minLength="2"
-          maxLength="30"
-          required
-        />
-        <span className="popup__form-input-error place-error"></span>
-        <input
-          type="url"
-          id="image"
-          form="formAdd"
-          className="popup__form-input popup__form-input_input_image"
-          name="link"
-          placeholder="Ссылка на картинку"
-          required
-        />
-        <span className="popup__form-input-error image-error"></span>
-      </PopupWithForm>
-
-      <PopupWithForm
+      <EditAvatarPopup
         isOpen={isAvatarPopupOpen}
-        name={"popup__avatar"}
-        title={"Обновить аватар"}
-        buttonText={"Сохранить"}
         onClose={closeAllPopups}
         handleClickClose={closeOverlayPopup}
-      >
-        <input
-          type="url"
-          id="avatar"
-          form="formAvatar"
-          className="popup__form-input popup__form-input_input_avatar"
-          name="avatar"
-          placeholder="Ссылка на аватар"
-          required
-        />
-        <span className="popup__form-input-error avatar-error"></span>
-      </PopupWithForm>
-    </>
+        onUpdateAvatar={handleUpdateAvatar}
+      />
+
+      <EditProfilePopup
+        isOpen={isEditPopupOpen}
+        onClose={closeAllPopups}
+        handleClickClose={closeOverlayPopup}
+        onUpdateUser={handleUpdateUser}
+      />
+
+      <AddPlacePopup
+        isOpen={isAddPopupOpen}
+        onClose={closeAllPopups}
+        handleClickClose={closeOverlayPopup}
+        onAddPlace={handleAddPlaceSubmit}
+      />
+    </CurrentUserContext.Provider>
   );
 }
 

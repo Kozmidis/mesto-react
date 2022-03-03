@@ -12,7 +12,12 @@
 1. REACT. (jsx)
 2. CRA.
 3. Хуки
-
+4. Provider
+5. Контекст
+6. Работа с данными. (стейт)
+7. Формы
+8. Рефы
+9. Управляемые инпуты
    **GitHub Pages**
 
 - [Ссылка на Github Pages](https://kozmidis.github.io/mesto-react/)

@@ -8,6 +8,7 @@ export default function PopupWithForm({
   onClose,
   handleClickClose,
   children,
+  onSubmit,
 }) {
   return (
     <div
@@ -16,7 +17,12 @@ export default function PopupWithForm({
       onClick={handleClickClose}
     >
       <div className="popup__container popup__content">
-        <form className="popup__form" name={name} noValidate>
+        <form
+          className="popup__form"
+          name={name}
+          onSubmit={onSubmit}
+          noValidate
+        >
           <h2 className="popup__form-title">{title}</h2>
 
           {children}
