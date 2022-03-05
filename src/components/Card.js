@@ -32,7 +32,7 @@ export default function Card({
     <div className="photos__card">
       <img
         src={card.link}
-        alt={card.alt}
+        alt={card.name}
         className="photos__card-image"
         onClick={handleCard}
       />

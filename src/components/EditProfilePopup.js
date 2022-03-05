@@ -16,7 +16,7 @@ export default function EditProfilePopup({
   React.useEffect(() => {
     setName(currentUser.name);
     setDescription(currentUser.about);
-  }, [currentUser]);
+  }, [currentUser, onClose]);
 
   function handleSubmit(e) {
     e.preventDefault();

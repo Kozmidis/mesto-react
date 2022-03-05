@@ -2,11 +2,11 @@ export default function ImagePopup({ card, onClose, handleClickClose }) {
   return (
     <div
       onClick={handleClickClose}
-      className={`popup popup_image ${card.image ? "popup_opened" : ""}`}
+      className={`popup popup_image ${card.link ? "popup_opened" : ""}`}
       id="popup__image"
     >
       <div className="popup__image-container popup__content">
-        <img src={card.image} alt={card.alt} className="popup__image" />
+        <img src={card.link} alt={card.name} className="popup__image" />
         <h2 className="popup__image-name">{card.name}</h2>
         <button
           onClick={onClose}

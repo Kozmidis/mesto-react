@@ -46,17 +46,27 @@ function App() {
   function handleCardLike(card) {
     const isLiked = card.likes.some((i) => i._id === currentUser._id);
 
-    api.changeLikeCardStatus(card._id, isLiked).then((item) => {
-      setUserCards((state) =>
-        state.map((c) => (c._id === card._id ? item : c))
-      );
-    });
+    api
+      .changeLikeCardStatus(card._id, isLiked)
+      .then((item) => {
+        setUserCards((state) =>
+          state.map((c) => (c._id === card._id ? item : c))
+        );
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   }
 
   function handleCardRemove(cardId) {
-    api.removeCard(cardId).then(() => {
-      setUserCards((state) => state.filter((c) => c._id !== cardId));
-    });
+    api
+      .removeCard(cardId)
+      .then(() => {
+        setUserCards((state) => state.filter((c) => c._id !== cardId));
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   }
 
   function handleUpdateUser(data) {

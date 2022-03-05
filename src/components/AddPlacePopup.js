@@ -10,6 +10,11 @@ export default function AddPlacePopup({
   const [name, setName] = React.useState("");
   const [link, setLink] = React.useState("");
 
+  React.useEffect(() => {
+    setName("");
+    setLink("");
+  }, [isOpen]);
+
   function onChangeInputName(e) {
     setName(e.target.value);
   }
@@ -36,6 +41,7 @@ export default function AddPlacePopup({
     >
       <input
         onChange={onChangeInputName}
+        value={name || ""}
         id="place"
         form="formAdd"
         type="text"
@@ -49,6 +55,7 @@ export default function AddPlacePopup({
       <span className="popup__form-input-error place-error"></span>
       <input
         onChange={onChangeInputLink}
+        value={link || ""}
         type="url"
         id="image"
         form="formAdd"
